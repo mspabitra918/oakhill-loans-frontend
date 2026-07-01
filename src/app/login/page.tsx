@@ -105,6 +105,7 @@ export default function LoginPage() {
         accessToken: response.access_token,
         sub: response.user.id,
         email: response.user.email,
+        phone: response.user.phone,
         role: "customer",
       });
       setOtpSent(false);

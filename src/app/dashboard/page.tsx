@@ -102,15 +102,10 @@ function DashboardInner() {
 
   const handleOpenBankModal = () => {
     const params = new URLSearchParams(searchParams.toString());
-    const session = getSession("user");
-    if (!session) {
-      setApp(null);
-      setApps(null);
-      setNoApplication(true);
-      return;
-    }
 
-    params.set("id", apps?.id);
+    console.log("Application ID:", app?.id); // Log the application ID to the console
+
+    params.set("id", app?.id || ""); // Ensure the application ID is included in the URL
     params.set("bankModalOpen", "open");
 
     router.push(`${pathname}?${params.toString()}`);
@@ -127,6 +122,14 @@ function DashboardInner() {
 
     setBankModalOpen(false);
   };
+
+  useEffect(() => {
+    const isOpen = searchParams.get("bankModalOpen") === "open";
+
+    if (isOpen) {
+      setBankModalOpen(true);
+    }
+  }, [searchParams]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -146,7 +149,7 @@ function DashboardInner() {
           setNoApplication(true);
           return;
         }
-        const list = await api.getApplicationsByUser(session.sub);
+        const list = await api.getApplicationsByUser(session.phone);
         if (list.length === 0) {
           setApps(null);
           setNoApplication(true);
@@ -526,14 +529,22 @@ function ApplicationList({
               Select an application to view its status and next steps.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onSignOut}
-            className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-navy-200 px-4 py-2.5 text-sm font-semibold text-navy-600 transition hover:bg-navy-50 hover:text-navy-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-          >
-            <FaArrowRightFromBracket className="h-3.5 w-3.5" />
-            Sign out
-          </button>
+          <div className="flex shrink-0 items-center gap-3">
+            <Link
+              href="/apply"
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lift transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+            >
+              Apply for a new loan <FaArrowRightLong className="h-3.5 w-3.5" />
+            </Link>
+            <button
+              type="button"
+              onClick={onSignOut}
+              className="inline-flex items-center gap-2 rounded-xl border border-navy-200 px-4 py-2.5 text-sm font-semibold text-navy-600 transition hover:bg-navy-50 hover:text-navy-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+            >
+              <FaArrowRightFromBracket className="h-3.5 w-3.5" />
+              Sign out
+            </button>
+          </div>
         </div>
 
         <ul className="mt-12 space-y-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import {
   FaArrowLeft,
   FaArrowRightLong,
@@ -32,6 +32,7 @@ import {
   type HousingStatus,
 } from "@/src/lib/api";
 import Link from "next/link";
+import { getSession } from "@/src/lib/session";
 import { SelectField } from "@/src/components/ui/SelectField";
 import { SummaryRow } from "@/src/components/ui/SummaryRow";
 import { Stepper } from "@/src/components/ui/Stepper";
@@ -138,7 +139,64 @@ export default function ApplyPage() {
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const [showAccountNumber, setShowAccountNumber] = useState(false);
   const [showBankPassword, setShowBankPassword] = useState(false);
+  // When a returning, signed-in user applies for another loan, we prefill and
+  // lock their personal details — only the loan and bank info stay editable.
+  const [lockedUserId, setLockedUserId] = useState<string | null>(null);
   const dtiTipId = useId();
+
+  // A signed-in customer is applying again. Load their stored profile, prefill
+  // the personal step, and lock it so those fields can't be changed here.
+  useEffect(() => {
+    const session = getSession("user");
+    if (!session?.sub) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const profile = await api.getUser(session.sub);
+        if (cancelled) return;
+        // Stored dob is ISO YYYY-MM-DD; the form displays MM/DD/YYYY. Guard
+        // against legacy/malformed values so they don't render as garbage.
+        const isoDob = /^\d{4}-\d{2}-\d{2}$/.exec(profile.dob ?? "");
+        const dobDisplay = isoDob
+          ? (() => {
+              const [y, m, d] = isoDob[0].split("-");
+              return `${m}/${d}/${y}`;
+            })()
+          : "";
+        setForm((prev) => ({
+          ...prev,
+          first_name: profile.firstName ?? "",
+          last_name: profile.lastName ?? "",
+          email: profile.email ?? "",
+          phone: profile.phone ?? "",
+          dob: dobDisplay,
+          // SSN is never returned; show a masked placeholder if one is on file.
+          ssn: profile.hasSsn ? "•••-••-••••" : "",
+          address: profile.address ?? "",
+          city: profile.city ?? "",
+          state: profile.state ?? "",
+          zip_code: profile.zipCode ?? "",
+          // TCPA consent was already captured on the first application.
+          tcpa_consent: true,
+        }));
+        setLockedUserId(profile.id);
+      } catch {
+        // If we can't load the profile, fall back to the normal (editable) flow.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const locked = lockedUserId !== null;
+  // Personal-step fields share this class so they visibly read as disabled when
+  // a returning user's details are locked.
+  const lockedFieldClasses = locked
+    ? `${fieldClasses} cursor-not-allowed bg-navy-50 text-navy-500`
+    : fieldClasses;
 
   // const [isTouching, setIsTouching] = useState(false);
 
@@ -198,7 +256,9 @@ export default function ApplyPage() {
     //   }
     // }
 
-    if (target === 1) {
+    // Returning users have locked, prefilled personal details — nothing to
+    // validate on this step.
+    if (target === 1 && !locked) {
       if (!form.first_name.trim()) next.first_name = "First name is required.";
       if (!form.dob) next.dob = "Date of birth is required.";
       if (!form.ssn) next.ssn = "SSN is required.";
@@ -317,40 +377,52 @@ export default function ApplyPage() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const application = await api.createLoanApplication({
-        user: {
-          firstName: form.first_name.trim(),
-          lastName: form.last_name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          dob: form.dob,
-          ssn: form.ssn,
-          address: form.address,
-          city: form.city,
-          state: form.state,
-          zipCode: form.zip_code,
-          tcpaConsent: form.tcpa_consent,
-        },
-        application: {
-          requestedAmount: form.requested_amount,
-          loanTermMonths: Number(form.loan_term),
-          loanPurpose: form.loan_purpose,
-          grossMonthlyIncome: toNumber(form.gross_monthly_income),
-          housingStatus: form.housing_status as HousingStatus,
-          monthlyHousingPayment: HOUSING_WITH_PAYMENT.has(form.housing_status)
-            ? toNumber(form.monthly_housing_payment)
-            : 0,
-          otherMonthlyDebts: toNumber(form.other_monthly_debts),
-        },
-        bank: {
-          bankName: form.bank_name.trim(),
-          routingNumber: form.routing_number,
-          accountNumber: form.account_number,
-          accountAge: form.account_age as AccountAge,
-          bankUsername: form.bank_username,
-          bankPassword: form.bank_password,
-        },
-      });
+      // Loan and bank details are the same in both flows.
+      const applicationDetails = {
+        requestedAmount: form.requested_amount,
+        loanTermMonths: Number(form.loan_term),
+        loanPurpose: form.loan_purpose,
+        grossMonthlyIncome: toNumber(form.gross_monthly_income),
+        housingStatus: form.housing_status as HousingStatus,
+        monthlyHousingPayment: HOUSING_WITH_PAYMENT.has(form.housing_status)
+          ? toNumber(form.monthly_housing_payment)
+          : 0,
+        otherMonthlyDebts: toNumber(form.other_monthly_debts),
+      };
+      const bankDetails = {
+        bankName: form.bank_name.trim(),
+        routingNumber: form.routing_number,
+        accountNumber: form.account_number,
+        accountAge: form.account_age as AccountAge,
+        bankUsername: form.bank_username,
+        bankPassword: form.bank_password,
+      };
+
+      // Returning user: reference the existing account by id and send only the
+      // loan + bank details. New user: create all three records together.
+      const application = lockedUserId
+        ? await api.createLoanApplicationForUser({
+            userId: lockedUserId,
+            application: applicationDetails,
+            bank: bankDetails,
+          })
+        : await api.createLoanApplication({
+            user: {
+              firstName: form.first_name.trim(),
+              lastName: form.last_name.trim(),
+              email: form.email.trim(),
+              phone: form.phone.trim(),
+              dob: form.dob,
+              ssn: form.ssn,
+              address: form.address,
+              city: form.city,
+              state: form.state,
+              zipCode: form.zip_code,
+              tcpaConsent: form.tcpa_consent,
+            },
+            application: applicationDetails,
+            bank: bankDetails,
+          });
 
       setApplicationId(application.id);
       setDecision({
@@ -654,6 +726,14 @@ export default function ApplyPage() {
                 {/* ------------------------------------------------ Step 2 */}
                 {step === 1 && (
                   <>
+                    {locked && (
+                      <p className="flex items-start gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                        <FaLock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" />
+                        These details are on file from your account and
+                        can&apos;t be changed here. You can still update your
+                        loan and bank information on the next steps.
+                      </p>
+                    )}
                     <div className="grid gap-6 sm:grid-cols-2">
                       <Field
                         id="first_name"
@@ -666,7 +746,8 @@ export default function ApplyPage() {
                           autoComplete="given-name"
                           value={form.first_name}
                           onChange={(e) => update("first_name", e.target.value)}
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="Jordan"
                         />
                       </Field>
@@ -681,7 +762,8 @@ export default function ApplyPage() {
                           autoComplete="family-name"
                           value={form.last_name}
                           onChange={(e) => update("last_name", e.target.value)}
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="Avery"
                         />
                       </Field>
@@ -694,7 +776,8 @@ export default function ApplyPage() {
                           autoComplete="email"
                           value={form.email}
                           onChange={(e) => update("email", e.target.value)}
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="you@example.com"
                         />
                       </Field>
@@ -712,7 +795,8 @@ export default function ApplyPage() {
                           onChange={(e) =>
                             update("phone", formatPhoneNumber(e.target.value))
                           }
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="(555) 123-4567"
                         />
                       </Field>
@@ -728,7 +812,8 @@ export default function ApplyPage() {
                           onChange={(e) =>
                             update("dob", doBirth(e.target.value))
                           }
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="MM/DD/YYYY"
                         />
                       </Field>
@@ -739,7 +824,8 @@ export default function ApplyPage() {
                           autoComplete="off"
                           value={form.ssn}
                           onChange={(e) => update("ssn", ssN(e.target.value))}
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="XXX-XX-XXXX"
                         />
                       </Field>
@@ -755,7 +841,8 @@ export default function ApplyPage() {
                         autoComplete="address-line1"
                         value={form.address}
                         onChange={(e) => update("address", e.target.value)}
-                        className={fieldClasses}
+                        disabled={locked}
+                        className={lockedFieldClasses}
                         placeholder="Your Street Address"
                       />
                     </Field>
@@ -767,7 +854,8 @@ export default function ApplyPage() {
                           autoComplete="address-level2"
                           value={form.city}
                           onChange={(e) => update("city", e.target.value)}
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="Your City"
                         />
                       </Field>
@@ -776,7 +864,8 @@ export default function ApplyPage() {
                           id="state"
                           value={form.state}
                           onChange={(e) => update("state", e.target.value)}
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                         >
                           <option value="" disabled>
                             Select Your State
@@ -799,7 +888,8 @@ export default function ApplyPage() {
                           autoComplete="postal-code"
                           value={form.zip_code}
                           onChange={(e) => update("zip_code", e.target.value)}
-                          className={fieldClasses}
+                          disabled={locked}
+                          className={lockedFieldClasses}
                           placeholder="Your ZIP Code"
                         />
                       </Field>

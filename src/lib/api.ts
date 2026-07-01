@@ -90,6 +90,33 @@ export type UpdateBankDetailPayload = Omit<
   "applicationId"
 >;
 
+// Stored profile for a returning user, used to prefill (and lock) the personal
+// step of the apply form. SSN is never returned in plaintext — `hasSsn` just
+// tells the UI whether one is already on file.
+export interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dob: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+  hasSsn: boolean;
+  tcpaConsent: boolean;
+}
+
+// POST /applications/loan-applications/existing — a returning, authenticated
+// user starts another loan. Only the loan + bank details are sent; the user is
+// referenced by id and their personal details are neither re-sent nor changed.
+export interface CreateExistingUserLoanApplicationPayload {
+  userId: string;
+  application: Omit<CreateApplicationPayload, "userId">;
+  bank: Omit<CreateBankDetailPayload, "applicationId">;
+}
+
 // Combined payload for POST /applications/loan-applications. The three records
 // (user + application + bank) are written atomically by the backend, so the
 // client omits the server-generated `userId` / `applicationId` foreign keys.
@@ -144,6 +171,7 @@ export interface AuthResult {
   accessToken: string;
   sub: string;
   email: string;
+  phone: string;
   role: "customer" | "underwriter" | "admin";
 }
 
@@ -229,6 +257,19 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+
+  // Returning-user apply flow: creates a new application + bank for an existing
+  // user without re-collecting their personal details.
+  createLoanApplicationForUser: (
+    payload: CreateExistingUserLoanApplicationPayload,
+  ) =>
+    request<ApplicationStatusView>("/applications/loan-applications/existing", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  // Full stored profile for a user, used to prefill the apply form.
+  getUser: (id: string) => request<UserProfile>(`/users/${id}`),
 
   createBankDetails: (payload: CreateBankDetailPayload) =>
     request<BankDetailResult>("/bank-details", {
