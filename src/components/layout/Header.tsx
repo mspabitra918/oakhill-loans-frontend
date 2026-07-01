@@ -1,0 +1,104 @@
+"use client";
+
+import { BRAND, NAV_LINKS } from "@/src/lib/constants";
+import Link from "next/link";
+import { useState } from "react";
+import { FaArrowRightLong } from "react-icons/fa6";
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-navy-100 bg-white/90 backdrop-blur">
+      <div className="container-x flex h-16 items-center justify-between">
+        <Link
+          href="/"
+          className="flex items-center gap-2"
+          aria-label={BRAND.name}
+        >
+          <span className="text-xl font-bold tracking-tight text-navy-900 ">
+            Oakhill
+            <span className="text-blue-700"> Loans</span>
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+          {NAV_LINKS.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-navy-700 transition hover:bg-navy-50 hover:text-navy-900"
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden md:block space-x-4">
+          <Link
+            href="/apply"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lift transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+          >
+            Apply Now <FaArrowRightLong />
+          </Link>
+          <Link
+            href="/login"
+            className="inline-flex items-center justify-center gap-2 rounded-lg  px-5 py-2.5 text-sm font-semibold text-blue-600 shadow-lift transition border border-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+          >
+            Dashboard Login <FaArrowRightLong />
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          className="md:hidden rounded-lg p-2 text-navy-700 hover:bg-navy-50"
+          aria-label="Toggle menu"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            {open ? (
+              <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+            ) : (
+              <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {open && (
+        <nav
+          className="border-t border-navy-100 bg-white md:hidden"
+          aria-label="Mobile"
+        >
+          <div className="container-x flex flex-col gap-1 py-3">
+            {NAV_LINKS.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50"
+                onClick={() => setOpen(false)}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <Link
+              onClick={() => setOpen(false)}
+              href="/apply"
+              className="inline-flex items-center justify-center gap-2 rounded-md  font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 bg-blue-600 text-white shadow-lift hover:bg-blue-700 focus-visible:ring-star-400  ml-2 px-5 py-3 text-sm"
+            >
+              Apply Now <FaArrowRightLong />
+            </Link>
+          </div>
+        </nav>
+      )}
+    </header>
+  );
+}

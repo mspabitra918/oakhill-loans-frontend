@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  /* Deep institutional navy — trust, stability */
+  --color-navy-50: #eef2f8;
+  --color-navy-100: #d6e0ef;
+  --color-navy-200: #aac1df;
+  --color-navy-300: #7397c6;
+  --color-navy-400: #436fa8;
+  --color-navy-500: #2a5288;
+  --color-navy-600: #1d3d6b;
+  --color-navy-700: #152e52;
+  --color-navy-800: #0e2140;
+  --color-navy-900: #0a1830;
+  --color-navy-950: #060f1f;
+
+  /* "Northstar" accent — bright optimistic gold */
+  --color-star-50: #fffbeb;
+  --color-star-100: #fef3c7;
+  --color-star-200: #fde68a;
+  --color-star-300: #fcd34d;
+  --color-star-400: #fbbf24;
+  --color-star-500: #f59e0b;
+  --color-star-600: #d97706;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --shadow-card: 0 4px 24px -8px rgba(10, 24, 48, 0.12);
+  --shadow-lift: 0 12px 40px -12px rgba(10, 24, 48, 0.22);
+}
+
+.container-x {
+  @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+}
+
+/* Shared button primitives used across interactive pages. */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lift transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-navy-200 bg-white px-6 py-3 text-sm font-semibold text-navy-800 transition hover:bg-navy-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-300 disabled:cursor-not-allowed disabled:opacity-50;
+}
