@@ -313,13 +313,14 @@ function DashboardInner() {
       <div className="container-x py-12 lg:py-16">
         <div className="flex items-start justify-between gap-4">
           <div className="max-w-3xl">
-            <Link
-              href="/dashboard"
+            <button
+              // href="/dashboard"
+              onClick={() => router.push("/dashboard")}
               className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700"
             >
               <FaArrowRightLong className="h-3 w-3 rotate-180" />
               All applications
-            </Link>
+            </button>
             <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-blue-600">
               Your dashboard
             </p>
