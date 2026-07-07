@@ -735,7 +735,7 @@ export default function ApplyPage() {
                         className={fieldClasses}
                       >
                         <option value="" disabled>
-                          Select a purpose…
+                          Select a term…
                         </option>
                         {LOAN.terms.map((p) => (
                           <option key={p} value={p}>
