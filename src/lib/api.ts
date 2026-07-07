@@ -2,7 +2,7 @@
 // which centralizes the base URL, JSON handling, and error surfacing.
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.oakhillloans.com";
 
 export class ApiError extends Error {
   status: number;
