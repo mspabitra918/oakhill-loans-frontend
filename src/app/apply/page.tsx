@@ -936,7 +936,7 @@ export default function ApplyPage() {
                         </span>
                         <input
                           id="gross_monthly_income"
-                          type="number"
+                          type="text"
                           inputMode="numeric"
                           min={0}
                           value={form.gross_monthly_income}
@@ -1009,7 +1009,7 @@ export default function ApplyPage() {
                           </span>
                           <input
                             id="monthly_housing_payment"
-                            type="number"
+                            type="text"
                             inputMode="numeric"
                             min={0}
                             value={form.monthly_housing_payment}
@@ -1035,7 +1035,7 @@ export default function ApplyPage() {
                         </span>
                         <input
                           id="other_monthly_debts"
-                          type="number"
+                          type="text"
                           inputMode="numeric"
                           min={0}
                           value={form.other_monthly_debts}

@@ -118,8 +118,8 @@ export function SignAgreementBlock({
     ["Principal amount", formatUSD(principal)],
     ["Term", `${months} months`],
     ["Fixed APR", `${LOAN.apr}%`],
-    ["Est. monthly payment", formatUSD(monthlyPayment)],
-    ["Est. total of payments", formatUSD(totalRepayment)],
+    ["Est. monthly payment", String(monthlyPayment.toFixed(2))],
+    ["Est. total of payments", String(totalRepayment.toFixed(2))],
   ];
 
   return (
