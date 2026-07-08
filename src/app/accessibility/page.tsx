@@ -74,7 +74,7 @@ export default function AccessibilityPage() {
             <li>
               Alternate Phone:{" "}
               <a
-                href={telHref(BRAND.phone)}
+                href={telHref(BRAND.phoneAlt)}
                 className="font-semibold text-blue-600 hover:text-blue-700"
               >
                 {BRAND.phoneAlt}

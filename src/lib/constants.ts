@@ -28,7 +28,7 @@ export const LOAN = {
   upfrontFees: 0,
   fundingHours: 24,
   // Available term lengths in months.
-  terms: [12, 24, 36, 48, 60],
+  terms: ["12 months", "24 months", "36 months", "48 months", "60 months"],
   // Gatekeeper thresholds (mirror the backend Rules Engine).
   minMonthlyIncome: 1000, // gross; auto-decline below this
   maxDtiPercent: 45, // DTI at/above this routes to manual underwriting
@@ -87,7 +87,8 @@ export function formatUSD(amount: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
@@ -247,7 +248,7 @@ export const SEO_PAGES: SeoPage[] = [
   {
     slug: "emergency-loans",
     eyebrow: "Emergency loans",
-    h1: "Fast funding for life's emergencies",
+    h1: "Fast funding for",
     span: "life's emergencies",
     intro:
       "When something unexpected hits, get a fixed 10% APR personal loan funded in as little as 24 hours — no collateral and no upfront fees.",

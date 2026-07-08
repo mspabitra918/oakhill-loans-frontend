@@ -42,7 +42,7 @@ export default function PersonalLoanEligibilityPage() {
   ];
 
   return (
-    <main className="bg-gray-50">
+    <div className="bg-gray-50">
       {/* Hero */}
       {/* <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
@@ -197,6 +197,6 @@ export default function PersonalLoanEligibilityPage() {
           </a>
         </div>
       </section> */}
-    </main>
+    </div>
   );
 }

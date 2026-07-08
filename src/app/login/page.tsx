@@ -37,6 +37,15 @@ export default function LoginPage() {
     }
   }, [router]);
 
+  // Count the resend cooldown down to zero so the "Resend OTP" button appears.
+  useEffect(() => {
+    if (otpTimer <= 0) return;
+    const id = setInterval(() => {
+      setOtpTimer((t) => (t <= 1 ? 0 : t - 1));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [otpTimer]);
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (loading) return;
@@ -92,7 +101,7 @@ export default function LoginPage() {
   // Handle OTP verification and login
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp || otp.length < 4) {
+    if (!otp || otp.length < 6) {
       // toast.error("Please enter a valid OTP");
       return;
     }
@@ -145,7 +154,7 @@ export default function LoginPage() {
               href="/"
               className="text-2xl font-bold tracking-tight text-navy-900"
             >
-              Oakhill<span className="text-blue-600">Loans</span>
+              Oakhill<span className="text-blue-600 ml-1">Loans</span>
             </Link>
             <h1 className="mt-6 text-3xl font-bold tracking-tight text-navy-900">
               Welcome back
@@ -264,7 +273,7 @@ export default function LoginPage() {
 
                 <button
                   type="submit"
-                  disabled={otpLoading || otp.length < 4}
+                  disabled={otpLoading || otp.length < 6}
                   className="w-full rounded-lg bg-purple-600 text-white py-2 font-medium hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {otpLoading ? "Verifying..." : "Verify & Login"}

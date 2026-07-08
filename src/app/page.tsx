@@ -267,7 +267,7 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {SEO_PAGES.map(({ slug, eyebrow, h1 }) => {
+            {SEO_PAGES.map(({ slug, eyebrow, h1, span }) => {
               const Icon = PURPOSE_ICONS[slug] ?? FaSackDollar;
               return (
                 <Link
@@ -282,7 +282,7 @@ export default function Home() {
                     {eyebrow}
                   </h3>
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-navy-600">
-                    {h1}.
+                    {h1} {span}
                   </p>
                   <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
                     Learn more
