@@ -16,7 +16,7 @@ const inter = Inter({
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${BRAND.domain}`;
 
 export const metadata: Metadata = {
-  icons: "/favicon.svg",
+  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg", apple: "/favicon.svg" },
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${BRAND.name} — Personal Loans up to $50,000, Funded in 24 Hours`,
