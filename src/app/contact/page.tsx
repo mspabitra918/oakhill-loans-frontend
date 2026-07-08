@@ -122,7 +122,7 @@ export default function ContactPage() {
             <h2 className="text-2xl font-bold tracking-tight text-navy-900">
               Get in touch
             </h2>
-            <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3 min-wfit">
               {CONTACT_METHODS.map(({ icon: Icon, label, lines }) => (
                 <li
                   key={label}
@@ -159,7 +159,7 @@ export default function ContactPage() {
           </div>
 
           {/* RIGHT — contact form */}
-          <div className="rounded-3xl border border-navy-100 bg-white p-7 shadow-card sm:p-8 min-w-2xl mx-auto">
+          <div className="rounded-3xl border border-navy-100 bg-white p-7 shadow-card sm:p-8 md:min-w-2xl md:mx-auto">
             {submitted ? (
               <div className="flex h-full flex-col items-center justify-center py-10 text-center">
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-green-800">
@@ -255,7 +255,7 @@ export default function ContactPage() {
               </form>
             )}
             {/* Trust Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
               <div className="flex items-center justify-center gap-2 bg-[#dbe4fa] rounded-lg py-3 px-4">
                 <svg
                   className="w-5 h-5 text-primary flex-shrink-0"
