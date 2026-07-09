@@ -7,8 +7,7 @@ export const BRAND = {
   legalName: "Oakhill Loans, LLC",
   domain: "oakhillloans.com",
   tagline: "Modern personal loans, funded in 24 hours.",
-  phone: "888-392-2321",
-  phoneAlt: "747-200-5220",
+  phone: "(747) 330-5650",
   email: "support@oakhillloans.com",
   address: {
     street: "1968 South Coast Highway #2900",
@@ -92,7 +91,7 @@ export function formatUSD(amount: number): string {
   }).format(amount);
 }
 
-// Tel-href safe version of a display phone number ("888-392-2321" -> "+18883922321").
+// Tel-href safe version of a display phone number ("(747) 330-5650" -> "+17473305650").
 export function telHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   return `tel:+1${digits.replace(/^1/, "")}`;

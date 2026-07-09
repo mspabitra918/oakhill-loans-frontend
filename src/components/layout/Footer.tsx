@@ -78,10 +78,6 @@ export function Footer() {
             <li>
               <a className="hover:text-blue-700" href={telHref(BRAND.phone)}>
                 {BRAND.phone}
-              </a>{" "}
-              ·{" "}
-              <a className="hover:text-blue-700" href={telHref(BRAND.phoneAlt)}>
-                {BRAND.phoneAlt}
               </a>
             </li>
             <li>

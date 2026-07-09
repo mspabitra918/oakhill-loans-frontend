@@ -23,7 +23,6 @@ const CONTACT_METHODS: ContactMethod[] = [
     label: "Call us",
     lines: [
       { text: BRAND.phone, href: telHref(BRAND.phone) },
-      { text: BRAND.phoneAlt, href: telHref(BRAND.phoneAlt) },
       { text: "Mon–Fri, 8am–6pm PT" },
     ],
   },
