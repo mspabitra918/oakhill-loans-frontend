@@ -173,7 +173,7 @@ export default function ApplyPage() {
           first_name: profile.firstName ?? "",
           last_name: profile.lastName ?? "",
           email: profile.email ?? "",
-          phone: profile.phone ?? "",
+          phone: formatPhoneNumber(profile.phone) ?? "",
           dob: dobDisplay,
           // SSN is never returned; show a masked placeholder if one is on file.
           ssn: profile.hasSsn ? "•••-••-••••" : "",
@@ -359,7 +359,15 @@ export default function ApplyPage() {
   }
 
   const formatPhoneNumber = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 10);
+    let digits = value.replace(/\D/g, "");
+
+    // Remove leading US country code (1) if 11 digits
+    if (digits.length === 11 && digits.startsWith("1")) {
+      digits = digits.slice(1);
+    }
+
+    // Limit to 10 digits
+    digits = digits.slice(0, 10);
 
     if (digits.length > 6) {
       return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
