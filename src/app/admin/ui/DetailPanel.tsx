@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { DualView } from "@/src/lib/api";
 import { formatUSD, LOAN } from "@/src/lib/constants";
+import { formatCalendarDate } from "@/src/lib/datetime";
 import {
   FaBuildingColumns,
   FaCheck,
@@ -197,13 +198,7 @@ export function DetailPanel({
               <DualRowUser
                 label="Applicant date of birth"
                 self={
-                  self.dob
-                    ? new Date(self.dob).toLocaleDateString("en-US", {
-                        month: "2-digit",
-                        day: "2-digit",
-                        year: "numeric",
-                      })
-                    : "-"
+                  formatCalendarDate(self.dob)
                 }
               />
               <DualRowUser

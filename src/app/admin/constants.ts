@@ -78,7 +78,7 @@ export function disbursementGate(detail: DualView): {
   if (status === "DECLINED")
     return { ok: false, reason: "Application was declined." };
   if (status === "BANK_REJECTED")
-    return { ok: false, reason: "Bank rejected — routing on banned list." };
+    return { ok: false, reason: "Bank rejected — awaiting corrected account." };
   if (!RELEASABLE_STATUSES.includes(status))
     return {
       ok: false,

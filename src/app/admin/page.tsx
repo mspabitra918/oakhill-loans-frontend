@@ -16,26 +16,9 @@ import { StatusBadge } from "./ui/StatusBadge";
 import { Sidebar } from "./ui/Sidebar";
 import { Topbar } from "./ui/TopBar";
 import { useRouter, useSearchParams } from "next/navigation";
+import { formatDateTime, todayStr } from "@/src/lib/datetime";
 
-// Local (not UTC) YYYY-MM-DD for "today".
-function todayStr(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime())
-    ? "—"
-    : d.toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-}
+// All admin timestamps render in California time — see @/src/lib/datetime.
 
 function AdminUnderwritingInner() {
   const router = useRouter();
@@ -339,7 +322,7 @@ function AdminUnderwritingInner() {
                               : "—"}
                           </td>
                           <td className="px-5 py-4 text-xs text-navy-500">
-                            {formatDate(row.createdAt)}
+                            {formatDateTime(row.createdAt)}
                           </td>
                           <td className="px-5 py-4 text-right text-navy-300">
                             <FaChevronRight className="ml-auto h-3.5 w-3.5" />

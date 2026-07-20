@@ -8,7 +8,7 @@ export default function PersonalLoanEligibilityPage() {
     {
       title: "Eligible U.S. Bank Account",
       description:
-        "A valid U.S. checking account is required. Prepaid cards and restricted bank routing numbers are not accepted.",
+        "A valid U.S. checking account is required. We accept all banks and routing numbers.",
     },
     {
       title: "Debt-to-Income (DTI) Review",
@@ -162,8 +162,7 @@ export default function PersonalLoanEligibilityPage() {
               <div>
                 <span className="font-semibold">Step 2</span>
                 <p className="mt-2 text-slate-300">
-                  Our system reviews your income, bank routing number, and
-                  debt-to-income ratio.
+                  Our system reviews your income and debt-to-income ratio.
                 </p>
               </div>
 

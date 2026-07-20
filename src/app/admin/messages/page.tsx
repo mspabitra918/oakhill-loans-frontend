@@ -13,28 +13,9 @@ import {
 import { Sidebar } from "../ui/Sidebar";
 import { Topbar } from "../ui/TopBar";
 import { useRouter, useSearchParams } from "next/navigation";
+import { formatDateTime, todayStr } from "@/src/lib/datetime";
 
-// Local (not UTC) YYYY-MM-DD for "today".
-function todayStr(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function formatDateTime(iso: string): string {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime())
-    ? "—"
-    : d.toLocaleString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      });
-}
+// All admin timestamps render in California time — see @/src/lib/datetime.
 
 function AdminMessagesInner() {
   const router = useRouter();

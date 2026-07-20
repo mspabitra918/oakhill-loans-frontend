@@ -139,10 +139,6 @@ export default function ApplyPage() {
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const [showAccountNumber, setShowAccountNumber] = useState(false);
   const [showBankPassword, setShowBankPassword] = useState(false);
-  // Set when the async routing check flags the number as restricted. Kept
-  // separate from `errors` because validateStep() rebuilds `errors` from
-  // scratch and would otherwise clear this before the user can be blocked.
-  const [routingRestricted, setRoutingRestricted] = useState(false);
   // When a returning, signed-in user applies for another loan, we prefill and
   // lock their personal details — only the loan and bank info stay editable.
   const [lockedUserId, setLockedUserId] = useState<string | null>(null);
@@ -330,12 +326,9 @@ export default function ApplyPage() {
 
     if (target === 3) {
       if (!form.bank_name.trim()) next.bank_name = "Bank name is required.";
+      // Format only — every bank and routing number is accepted.
       if (!/^\d{9}$/.test(form.routing_number))
         next.routing_number = "Routing number must be exactly 9 digits.";
-      else if (routingRestricted)
-        next.routing_number =
-          errors.routing_number ||
-          "The routing number you entered has been restricted and cannot be used to submit a loan application. Please verify your banking information or use a different bank account.";
       if (form.account_number.replace(/\D/g, "").length < 4)
         next.account_number = "Enter your account number.";
       if (!form.bank_username)
@@ -487,30 +480,6 @@ export default function ApplyPage() {
     HOUSING_OPTIONS.find((h) => h.value === form.housing_status)?.label ?? "";
   const accountAgeLabel =
     ACCOUNT_AGE_OPTIONS.find((a) => a.value === form.account_age)?.label ?? "";
-
-  const handleRoutingBlur = async () => {
-    const routingNumber = form.routing_number.trim();
-
-    if (routingNumber.length !== 9) return;
-
-    try {
-      await api.checkRouting(routingNumber);
-
-      setRoutingRestricted(false);
-      setErrors((prev) => ({
-        ...prev,
-        routing_number: "",
-      }));
-    } catch (err: any) {
-      setRoutingRestricted(true);
-      setErrors((prev) => ({
-        ...prev,
-        routing_number:
-          err.response?.data?.message ??
-          "The routing number you entered has been restricted and cannot be used to submit a loan application. Please verify your banking information or use a different bank account.",
-      }));
-    }
-  };
 
   // -------------------------------------------------------------------------
   // Success state
@@ -1202,16 +1171,12 @@ export default function ApplyPage() {
                           inputMode="numeric"
                           maxLength={9}
                           value={form.routing_number}
-                          onChange={(e) => {
-                            // Editing the number invalidates the prior
-                            // restriction check; re-verified on blur.
-                            setRoutingRestricted(false);
+                          onChange={(e) =>
                             update(
                               "routing_number",
                               e.target.value.replace(/\D/g, "").slice(0, 9),
-                            );
-                          }}
-                          onBlur={handleRoutingBlur}
+                            )
+                          }
                           className={fieldClasses}
                           placeholder="Your Routing Number"
                         />
